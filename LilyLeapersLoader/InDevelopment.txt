@@ -1,0 +1,12 @@
+﻿        public void Timer()
+        {
+            if (!TimerStarted)
+            {
+                SpeedrunTimerEarly = Time.time;
+                TimerStarted = true;
+            } 
+            float SpeedrunTimerStageTwo = Time.time - SpeedrunTimerEarly;
+            string SpeedrunMins = ((int) SpeedrunTimerStageTwo / 60).ToString();
+            string SpeedrunSecs = (SpeedrunTimerStageTwo % 60).ToString("f2");
+            SpeedrunTimer = SpeedrunMins + ":" + SpeedrunSecs;
+        } // Timer
