@@ -40,8 +40,7 @@ namespace LilyLeapersLoader
         string SpeedrunTimer;
         private float SpeedrunTimerEarly;
         MultiplayerStartingPosition[] MultiPlayerStartPos;
-        Vector3 SpawnPos = new Vector3(-30.4235f, 2.6f, -178.5029f);
-        GameObject IntroductionCamera = GameObject.Find("IntroCams");
+        Vector3 SpawnPos = new Vector3(-26.64f, 2.3948f, -178.41f);
         private bool StartStoppingIntroCam = false;
         Sprite IntroCanvasLogo;
         private bool LetReload = true;
@@ -65,7 +64,8 @@ namespace LilyLeapersLoader
         private void GetLilyLeapersLogo()
         {
             WebClient GetFile = new WebClient();
-            byte[] DataAsByte = GetFile.DownloadData("https://github.com/kota69th/Z180/blob/main/UI_Medal_Icon_LilyLeapers.png?raw=true");
+            byte[] DataAsByte = GetFile.DownloadData
+            ("https://github.com/kota69th/Z180/blob/main/UI_Medal_Icon_LilyLeapers.png?raw=true");
             System.Drawing.Image IMGWithSystem;
             using (var ms = new System.IO.MemoryStream(DataAsByte))
             {
@@ -74,9 +74,9 @@ namespace LilyLeapersLoader
             int size = IMGWithSystem.Width * IMGWithSystem.Height;
             tex = new Texture2D(IMGWithSystem.Width, IMGWithSystem.Height);
             if (ImageConversion.LoadImage(tex, DataAsByte))
-            {
-                IntroCanvasLogo = Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100f, 0U, SpriteMeshType.Tight);
-            }
+                IntroCanvasLogo = Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height), 
+                new Vector2(0.5f, 0.5f), 100f, 0U, SpriteMeshType.Tight);
+            
         }
 
         AssetBundle UIBundle;
@@ -151,7 +151,7 @@ namespace LilyLeapersLoader
             // Create Spawn block for Fall Factory and Checkpoint System.
             SpawnForFF = GameObject.CreatePrimitive(PrimitiveType.Cube);
             SpawnForFF.GetComponent<Renderer>().material.color = new UnityEngine.Color(0f, 5f, 0f, 1f);
-            UnityEngine.Object.Destroy((UnityEngine.Object)SpawnForFF.GetComponent<BoxCollider>());
+            UnityEngine.Object.Destroy(SpawnForFF.GetComponent<BoxCollider>());
             SpawnForFF.name = "Spawn";
             // Download the Lily Leapers logo from Github.
             GetLilyLeapersLogo();
@@ -167,7 +167,7 @@ namespace LilyLeapersLoader
                 UIIntro.LevelDescriptionText = "Use the drums to bounce to the finish line!\nUsing Lily Leapers Loader!";
                 GameObject.Find("title-tab").GetComponent<UnityEngine.UI.Image>().color = new UnityEngine.Color(0.007f, 0.713f, 0.32f, 1f);
             }
-            GameObject.Find("IntroCams").GetComponent<IntroCameras>().Play(1);
+            UnityEngine.Object.FindObjectOfType<IntroCameras>().Play(1);
             GameObject.Find("IntroCanvas").SetActive(true);
             // Wait IntroCamera duration and then sapwn the Player.
             yield return new WaitForSeconds(CameraDirectorLL.IntroCamerasDuration);
@@ -177,12 +177,6 @@ namespace LilyLeapersLoader
             LetReload = true;
         }
 
-        private void Checkpoint()
-        {
-            SpawnForFF.transform.position = GameObject.Find("FallGuy").transform.position;
-            SpawnForFF.GetComponent<Renderer>().material.color = new UnityEngine.Color(0f, 5f, 5f, 1f);
-            return;
-        }
         public override void OnUpdate()
         {
             // On Scene was loaded.
@@ -190,10 +184,9 @@ namespace LilyLeapersLoader
             {
                 try
                 {
-                    GameObject IntroCams = GameObject.Find("CM_Intro_01");
-                    IntroCams.active = false;
-                    GameObject.Find("Main Camera Brain").transform.position = new Vector3(-179.874f, 175.222f, -182.275f);
-                    GameObject.Find("Main Camera Brain").transform.rotation = Quaternion.Euler(33.3f, 64.2f, 0f);
+                    if(GameObject.Find("CM_Intro_01")) GameObject.Find("CM_Intro_01").SetActive(false);
+                       GameObject.Find("Main Camera Brain").transform.position = new Vector3(-179.874f, 175.222f, -182.275f);
+                       GameObject.Find("Main Camera Brain").transform.rotation = Quaternion.Euler(33.3f, 64.2f, 0f);
                 }
                 catch { }
                 StartStoppingIntroCam = false;
@@ -209,22 +202,22 @@ namespace LilyLeapersLoader
                 } catch { }
 
                 if (GameObject.Find("FallGuy").transform.position.y < -50)
-                {
                     GameObject.Find("FallGuy").transform.position = SpawnForFF.transform.position;
-                }
+                
 
                 if (Input.GetKeyDown(KeyCode.C))
-                {
-                    Checkpoint();
-                }
+                  {
+                      SpawnForFF.transform.position = GameObject.Find("FallGuy").transform.position;
+                      SpawnForFF.GetComponent<Renderer>().material.color = new UnityEngine.Color(0f, 5f, 5f, 1f);
+                  }
+                
 
-                if (Input.GetKeyDown(KeyCode.X))
-                {
-                    if (LevelAndFGLoaded)
-                    {
-                        SpawnForFF.GetComponent<Renderer>().material.color = new UnityEngine.Color(0f, 5f, 0f, 1f);
-                        SpawnForFF.transform.position = new Vector3(-26.64f, 2.3948f, -178.41f);
-                    }
+                if (Input.GetKeyDown(KeyCode.X) && LevelAndFGLoaded)
+                  {
+                      SpawnForFF.GetComponent<Renderer>().material.color = new UnityEngine.Color(0f, 5f, 0f, 1f);
+                      SpawnForFF.transform.position = SpawnPos; 
+                  }
+                   
                 }
             }
             if (Input.GetKeyDown(KeyCode.F1))
@@ -233,19 +226,17 @@ namespace LilyLeapersLoader
                 {
                     Cursor.visible = true;
                     Cursor.lockState = CursorLockMode.None;
-                    return;
                 }
                 if (Cursor.visible)
                 {
                     Cursor.visible = false;
                     Cursor.lockState = CursorLockMode.Locked;
-                    return;
                 }
             }
+            
             if (Input.GetKeyDown(KeyCode.F2))
-            {
                 UIMainObj.SetActive(!UIMainObj.activeSelf);
-            }
+            
         }
     }
 
@@ -260,18 +251,15 @@ namespace LilyLeapersLoader
         public static Button GetButton(string Inst)
         {
             Button Button = (Button)null;
-            if(Inst == "Load")
-            {
+            if (Inst == "Load")
                 Button = GameObject.Find("LoadLL").GetComponent<Button>();
-            }
+            
             if (Inst == "Play")
-            {
                 Button = GameObject.Find("PlayLL").GetComponent<Button>();
-            }
+            
             if (Inst == "Help")
-            {
                 Button = GameObject.Find("KeyBinds").GetComponent<Button>();
-            }
+            
 
             return Button;
         }
